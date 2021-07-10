@@ -1,55 +1,43 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <unordered_map>
+#include <set>
 
 using namespace std;
 
-string solution(vector<string> participant, vector<string> completion) 
+bool solution(vector<string> phone_book)
 {
-    string answer = "";
+    set<string> phoneSet{ phone_book.begin(), phone_book.end() };
 
-    unordered_map<string, int> completionMap; 
-    for (size_t i = 0; i < completion.size(); ++i) 
+    auto iter1 = phoneSet.begin(); 
+    auto iter2 = iter1;
+    ++iter2; 
+
+    while (iter2 != phoneSet.end()) 
     {
-        const string& name = completion[i]; 
-        const auto iter = completionMap.find(name); 
-        
-        if (iter == completionMap.end())
-            completionMap.emplace(name, 1);
-        else
-            ++(iter->second); 
+        const string& current = *iter1;
+        const string& next = *iter2; 
+
+        if ((current[0] == next[0]) && (next.find(current) != string::npos))
+            return false; 
+
+        ++iter1; 
+        ++iter2; 
     }
-
-    for (size_t i = 0; i < participant.size(); ++i) 
-    {
-        const string& name = participant[i]; 
-        const auto iter = completionMap.find(name); 
-        
-        answer = name;
-
-        if (iter == completionMap.end())
-            break;
-        else 
-        {
-            int& count = iter->second; 
-
-            if (count)
-                --count;
-            else
-                break;
-        }
-    }
-
-    return answer; 
+    
+    return true; 
 }
 
 int main() 
 {
-    vector<string> participant = { "mislav", "stanko", "mislav", "ana" };
-    vector<string> completion = { "stanko", "ana", "mislav" };
+    // vector<string> phone_book = { "119", "97674223", "1195524421" };
+    vector<string> phone_book = { "123", "456", "789" };
+    // vector<string> phone_book = { "12", "123", "1235", "567", "88" };
 
-    cout << solution(participant, completion) << endl; 
+    if (solution(phone_book))
+        cout << "true";
+    else
+        cout << "false"; 
 
     return 0; 
 }
