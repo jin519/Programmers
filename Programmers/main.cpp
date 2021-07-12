@@ -1,43 +1,41 @@
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <iostream>
-#include <set>
 
 using namespace std;
 
-bool solution(vector<string> phone_book)
+int solution(vector<vector<string>> clothes) 
 {
-    set<string> phoneSet{ phone_book.begin(), phone_book.end() };
+    int answer = 1;
+    unordered_map<string, int> clothMap; 
 
-    auto iter1 = phoneSet.begin(); 
-    auto iter2 = iter1;
-    ++iter2; 
-
-    while (iter2 != phoneSet.end()) 
+    for (const auto& entry : clothes) 
     {
-        const string& current = *iter1;
-        const string& next = *iter2; 
+        const string& cloth = entry.front(); 
+        const string& type = entry.back(); 
 
-        if ((current[0] == next[0]) && (next.find(current) != string::npos))
-            return false; 
-
-        ++iter1; 
-        ++iter2; 
+        auto iter = clothMap.find(type); 
+        
+        if (iter == clothMap.end())
+            clothMap.emplace(type, 1);
+        else
+            ++(iter->second); 
     }
-    
-    return true; 
+
+    for (const auto& entry : clothMap)
+        answer *= (entry.second + 1); 
+
+    --answer; 
+
+    return answer;
 }
 
 int main() 
 {
-    // vector<string> phone_book = { "119", "97674223", "1195524421" };
-    vector<string> phone_book = { "123", "456", "789" };
-    // vector<string> phone_book = { "12", "123", "1235", "567", "88" };
-
-    if (solution(phone_book))
-        cout << "true";
-    else
-        cout << "false"; 
+    // vector<vector<string>> clothes = { { "yellowhat", "headgear" }, { "bluesunglasses", "eyewear" }, { "green_turban", "headgear" } };
+    vector<vector<string>> clothes = { { "crowmask", "face" }, { "bluesunglasses", "face" }, { "smoky_makeup", "face" } };
+    cout << solution(clothes); 
 
     return 0; 
 }
