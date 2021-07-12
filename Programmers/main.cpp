@@ -1,41 +1,73 @@
 #include <string>
 #include <vector>
-#include <unordered_map>
 #include <iostream>
+#include <unordered_map>
+#include <map>
 
 using namespace std;
 
-int solution(vector<vector<string>> clothes) 
+vector<int> solution(vector<string> genres, vector<int> plays) 
 {
-    int answer = 1;
-    unordered_map<string, int> clothMap; 
+    vector<int> answer;
 
-    for (const auto& entry : clothes) 
+    unordered_map<string, int> genreTotalMap;
+    unordered_map<string, multimap<int, int, greater<int>>> genrePlayIndexMap; 
+
+    for (size_t index = 0ULL; index < genres.size(); ++index) 
     {
-        const string& cloth = entry.front(); 
-        const string& type = entry.back(); 
+        const string& genre = genres[index]; 
+        const int play = plays[index]; 
 
-        auto iter = clothMap.find(type); 
+        auto iter = genreTotalMap.find(genre); 
         
-        if (iter == clothMap.end())
-            clothMap.emplace(type, 1);
+        if (iter == genreTotalMap.end())
+        {
+            genreTotalMap.emplace(genre, play);
+
+            multimap<int, int, greater<int>> playIndexMap; 
+            playIndexMap.emplace(play, index); 
+
+            genrePlayIndexMap.emplace(genre, playIndexMap);
+        }
         else
-            ++(iter->second); 
+        {
+            iter->second += play;
+            genrePlayIndexMap[genre].emplace(play, index); 
+        }
     }
 
-    for (const auto& entry : clothMap)
-        answer *= (entry.second + 1); 
+    multimap<int, string, greater<int>> genreTotalMultimap; 
 
-    --answer; 
+    for (const auto& entry : genreTotalMap)
+        genreTotalMultimap.emplace(entry.second, entry.first); 
 
+    for (const auto& entry : genreTotalMultimap) 
+    {
+        const string& genre = entry.second; 
+
+        int count = 0; 
+        for (const auto& entry2 : genrePlayIndexMap[genre])
+        {
+            if (count >= 2)
+                break;
+
+            answer.emplace_back(entry2.second); 
+            ++count;
+        }
+    }
+   
     return answer;
 }
 
 int main() 
 {
-    // vector<vector<string>> clothes = { { "yellowhat", "headgear" }, { "bluesunglasses", "eyewear" }, { "green_turban", "headgear" } };
-    vector<vector<string>> clothes = { { "crowmask", "face" }, { "bluesunglasses", "face" }, { "smoky_makeup", "face" } };
-    cout << solution(clothes); 
+    vector<string> genres = { "classic", "pop", "classic", "classic", "pop" };
+    vector<int> plays = { 500, 600, 150, 800, 2500 };
+
+    const vector<int>& answer = solution(genres, plays); 
+
+    for (const int elem : answer)
+        cout << elem << ' '; 
 
     return 0; 
 }
