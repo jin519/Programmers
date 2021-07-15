@@ -1,70 +1,56 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <unordered_map>
-#include <map>
 
 using namespace std;
 
-vector<int> solution(vector<string> genres, vector<int> plays) 
+vector<int> solution(vector<int> progresses, vector<int> speeds) 
 {
     vector<int> answer;
+    int day = 0;
+    int count = 0; 
 
-    unordered_map<string, int> genreTotalMap;
-    unordered_map<string, multimap<int, int, greater<int>>> genrePlayIndexMap; 
-
-    for (size_t index = 0ULL; index < genres.size(); ++index) 
+    for (size_t i = 0; i < progresses.size(); ++i) 
     {
-        const string& genre = genres[index]; 
-        const int play = plays[index]; 
+        int progress = progresses[i];
+        const int speed = speeds[i]; 
 
-        auto iter = genreTotalMap.find(genre); 
-        
-        if (iter == genreTotalMap.end())
+        progress += (day * speed); 
+
+        if (progress >= 100)
+            ++count;
+        else 
         {
-            genreTotalMap.emplace(genre, play);
+            if (count) 
+            {
+                answer.emplace_back(count);
+                count = 0;
+            }
 
-            multimap<int, int, greater<int>> playIndexMap; 
-            playIndexMap.emplace(play, index); 
+            while (progress < 100)
+            {
+                ++day;
+                progress += speed;
+            }
 
-            genrePlayIndexMap.emplace(genre, playIndexMap);
-        }
-        else
-        {
-            iter->second += play;
-            genrePlayIndexMap[genre].emplace(play, index); 
-        }
-    }
-
-    multimap<int, string, greater<int>> genreTotalMultimap; 
-
-    for (const auto& entry : genreTotalMap)
-        genreTotalMultimap.emplace(entry.second, entry.first); 
-
-    for (const auto& entry : genreTotalMultimap) 
-    {
-        const string& genre = entry.second; 
-
-        int count = 0; 
-        for (const auto& entry2 : genrePlayIndexMap[genre])
-        {
-            if (count >= 2)
-                break;
-
-            answer.emplace_back(entry2.second); 
             ++count;
         }
     }
-   
+
+    if (count)
+        answer.emplace_back(count); 
+
     return answer;
 }
 
 int main() 
 {
-    vector<string> genres = { "classic", "pop", "classic", "classic", "pop" };
-    vector<int> plays = { 500, 600, 150, 800, 2500 };
+    //vector<int> progresses = { 93, 30, 55 };
+    vector<int> progresses = { 95, 90, 99, 99, 80, 99 };
+    //vector<int> speeds = { 1, 30, 5 };
+    vector<int> speeds = { 1, 1, 1, 1, 1, 1 };
 
-    const vector<int>& answer = solution(genres, plays); 
+    const vector<int>& answer = solution(progresses, speeds); 
 
     for (const int elem : answer)
         cout << elem << ' '; 
