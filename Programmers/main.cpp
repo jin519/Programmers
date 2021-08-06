@@ -1,59 +1,41 @@
 #include <string>
 #include <vector>
-#include <queue>
 #include <iostream>
 
 using namespace std;
 
-int solution(int bridge_length, int weight, vector<int> truck_weights) 
+vector<int> solution(vector<int> prices) 
 {
-    int time = 0;
+    vector<int> answer; 
+    const int size = (int(prices.size()) - 1); 
 
-    queue<int> bridge;
-    for (size_t i = 0; i < bridge_length; ++i)
-        bridge.emplace(0); 
-
-    int sum = 0;
-    int i = 0; 
-
-    do
+    for (int i = 0; i < size; ++i) 
     {
-        ++time;
+        int price = prices[i]; 
+        int count = 1; 
 
-        // 트럭 한칸 이동
-        sum -= bridge.front();
-        bridge.pop();
-
-        const int truck = truck_weights[i];
-        sum += truck;
-
-        if (sum <= weight)
+        for (int j = (i + 1); j < size; ++j)
         {
-            // 유효 트럭 배치
-            bridge.emplace(truck);
-            ++i; 
+            if (price <= prices[j])
+                ++count;
+            else
+                break;
         }
-        else 
-        {
-            // 빈 트럭 배치
-            bridge.emplace(0); 
-            sum -= truck;
-        }
-    } while (i < truck_weights.size()); 
 
-    // 유효 트럭 전부 이동
-    time += bridge_length;
+        answer.emplace_back(count); 
+    }
 
-    return time;
+    answer.emplace_back(0); 
+
+    return answer;
 }
 
 int main() 
 {
-    int bridge_length = 2;
-    int weight = 10; 
-    vector<int> truck_weights = { 7,4,5,6 };
-
-    cout << solution(bridge_length, weight, truck_weights);
+    vector<int> prices = { 1, 2, 3, 2, 3 };
+    
+    for (int price : solution(prices)) 
+        cout << price << endl;
 
     return 0; 
 }
